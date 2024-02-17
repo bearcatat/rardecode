@@ -364,8 +364,20 @@ func (rc *ReadCloser) Volumes() []string {
 }
 
 // OpenReader opens a RAR archive specified by the name and returns a ReadCloser.
-func OpenReader(name, password string, openFunc OpenFunc) (*ReadCloser, error) {
-	v, err := openVolume(name, password,openFunc)
+func OpenReader(name, password string) (*ReadCloser, error) {
+	v, err := openVolume(name, password, os.Open)
+	if err != nil {
+		return nil, err
+	}
+	rc := new(ReadCloser)
+	rc.v = v
+	rc.Reader.init(v)
+	return rc, nil
+}
+
+// OpenReader opens a RAR archive specified by the name and returns a ReadCloser.
+func OpenReaderWithOpenFunc(name, password string, openFunc OpenFunc) (*ReadCloser, error) {
+	v, err := openVolume(name, password, openFunc)
 	if err != nil {
 		return nil, err
 	}
