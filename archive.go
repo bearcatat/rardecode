@@ -144,10 +144,11 @@ type volume struct {
 	files []string      // full path names for current volume files processed
 	num   int           // volume number
 	old   bool          // uses old naming scheme
+	open  OpenFunc
 }
 
 func (v *volume) openFile(file string) error {
-	f, err := os.Open(v.dir + file)
+	f, err := v.open(v.dir + file)
 	if err != nil {
 		return err
 	}
@@ -305,11 +306,12 @@ func (v *volume) Close() error {
 	return v.f.Close()
 }
 
-func openVolume(name, password string) (*volume, error) {
+func openVolume(name, password string, openFunc OpenFunc) (*volume, error) {
 	var err error
 	v := new(volume)
 	v.dir, v.file = filepath.Split(name)
-	v.f, err = os.Open(name)
+	v.open = openFunc
+	v.f, err = v.open(name)
 	if err != nil {
 		return nil, err
 	}
