@@ -1,1 +1,1 @@
-module github.com/nwaples/rardecode
+module github.com/bearcatat/rardecode
